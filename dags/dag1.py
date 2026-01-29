@@ -24,3 +24,5 @@ with DAG(
         task_id='tsk3',
         bash_command='sleep 5'
     )
+    
+    task1 >> task2 >> task3
