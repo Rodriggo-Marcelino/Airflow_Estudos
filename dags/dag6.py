@@ -1,0 +1,31 @@
+import pendulum
+from airflow import DAG
+from airflow.providers.standard.operators.bash import BashOperator
+
+
+with DAG(
+    dag_id='Testando_trigger_dag_2',
+    description='Testando trigger_dag no Airflow',
+    schedule=None,
+    start_date=pendulum.datetime(2025, 1, 1, tz="America/Sao_Paulo"),
+    catchup=False,
+    tags=['curso', 'exemplo'],
+) as dag:
+    
+    task1 = BashOperator(
+        task_id='tsk1',
+        bash_command='exit 1'
+    )
+
+    task2 = BashOperator(
+        task_id='tsk2',
+        bash_command='sleep 5'
+    )
+
+    task3 = BashOperator(
+        task_id='tsk3',
+        bash_command='sleep 5',
+        trigger_rule='one_failed'
+    )
+
+    [ task1, task2 ] >>  task3
