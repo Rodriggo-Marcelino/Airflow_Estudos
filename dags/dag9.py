@@ -1,10 +1,11 @@
 import pendulum
 from airflow import DAG
 from airflow.providers.standard.operators.bash import BashOperator
+from airflow.utils.task_group import TaskGroup
 
 
 with DAG(
-    dag_id='criando_dag_complexa',
+    dag_id='criando_dag_complexa_task_grup',
     description='Criando uma DAG complexa para exemplificar o uso de trigger rules',
     schedule=None,
     start_date=pendulum.datetime(2025, 1, 1, tz="America/Sao_Paulo"),
@@ -42,24 +43,27 @@ with DAG(
         bash_command='sleep 5',
     )
     
-    task7 = BashOperator(
-        task_id='tsk7',
-        bash_command='sleep 5'
-    )
-
-    task8 = BashOperator(
-        task_id='tsk8',
-        bash_command='sleep 5'
-    )
-
-    task9 = BashOperator(
-        task_id='tsk9',
-        bash_command='sleep 5',
-    )
+    with TaskGroup('grupo_de_tasks_1') as grupo_de_tasks_1:
     
+        task7 = BashOperator(
+            task_id='tsk7',
+            bash_command='sleep 5'
+        )
+
+        task8 = BashOperator(
+            task_id='tsk8',
+            bash_command='sleep 5'
+        )
+
+        task9 = BashOperator(
+            task_id='tsk9',
+            bash_command='sleep 5',
+        )
+            
+        
 
     task1 >> task2 
     task3 >> task4
     [task2, task4] >> task5
     task5 >> task6
-    task6 >> [task7, task8, task9]
+    task6 >> grupo_de_tasks_1
