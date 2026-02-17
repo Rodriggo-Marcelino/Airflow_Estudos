@@ -1,0 +1,31 @@
+import pendulum  
+from airflow import DAG, Dataset
+from airflow.providers.standard.operators.python import PythonOperator
+import pandas as pd
+
+mydataset = Dataset("file:///opt/airflow/data/Churn.csv")
+
+with DAG(
+    
+    dag_id='consumer',
+    description='Consumer de dados do DAG de produção',
+    schedule=None,
+    start_date=pendulum.datetime(2025, 1, 1, tz="America/Sao_Paulo"),
+    catchup=False,
+    tags=['curso', 'exemplo'],
+    
+) as dag:
+
+    def create_dataset_file():
+        df = pd.read_csv("/opt/airflow/data/Churn_new.csv", sep=';')
+        
+        df.to_csv("/opt/airflow/data/Churn_new2.csv", index=False)
+        
+    create_dataset_file_task = PythonOperator(
+        task_id='create_dataset_file',
+        python_callable=create_dataset_file,
+    )
+    
+    create_dataset_file_task
+        
+        
